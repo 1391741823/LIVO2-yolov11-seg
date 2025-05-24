@@ -1,0 +1,128 @@
+# Ultralytics 🚀 AGPL-3.0 License - https://ultralytics.com/license
+
+# Global configuration YAML with settings and hyperparameters for YOLO training, validation, prediction and export
+# For documentation see https://docs.ultralytics.com/usage/cfg/
+
+task: detect # (str) YOLO task, i.e. detect, segment, classify, pose, obb
+mode: train # (str) YOLO mode, i.e. train, val, predict, export, track, benchmark
+
+# Train settings -------------------------------------------------------------------------------------------------------
+model: # (str, optional) 模型文件的路径，例如 yolov8n.pt 或 yolov8n.yaml
+data: # (str, optional) 数据集配置文件的路径，例如 coco8.yaml
+epochs: 100 # (int) 训练的轮数，默认值为 300
+time: # (float, optional) 训练的总时长（以小时为单位），如果设置了此值，将覆盖 epochs 参数
+patience: 100 # (int) 在没有显著改进时等待的轮数，用于早停
+batch: 16 # (int) 每批次的图像数量（-1 表示自动批次大小），默认值为 16
+imgsz: 640 # (int | list) 输入图像的大小，训练和验证模式下为整数，预测和导出模式下为列表 [h, w]
+save: True # (bool) 是否保存训练检查点和预测结果
+save_period: -1 # (int) 每隔 x 个 epoch 保存一次检查点（如果 < 1，则禁用）
+cache: False # (bool) 是否使用缓存加载数据，选项为 True/ram, disk 或 False
+device: # (int | str | list, optional) 运行设备，例如 cuda device=0 或 device=0,1,2,3 或 device=cpu
+workers: 8 # (int) 数据加载的工作线程数量（每个 RANK 如果使用 DDP）
+project: # (str, optional) 项目名称
+name: # (str, optional) 实验名称，结果将保存到 'project/name' 目录
+exist_ok: True # (bool) 是否覆盖已存在的实验
+pretrained: True # (bool | str) 是否使用预训练模型（bool）或加载权重的模型路径（str）
+optimizer: auto # (str) 优化器类型，选项包括 [SGD, Adam, Adamax, AdamW, NAdam, RAdam, RMSProp, auto]
+verbose: True # (bool) 是否打印详细输出
+seed: 0 # (int) 随机种子，用于结果复现
+deterministic: True # (bool) 是否启用确定性模式
+single_cls: False # (bool) 将多类别数据作为单类别进行训练
+rect: False # (bool) 如果 mode='train'，则使用矩形训练；如果 mode='val'，则使用矩形验证
+cos_lr: False # (bool) 是否使用余弦学习率调度器
+close_mosaic: 10 # (int) 在最后的几个 epoch 禁用 Mosaic 数据增强（0 表示禁用）
+resume: False # (bool) 从上一次的检查点恢复训练
+amp: True # (bool) 是否启用自动混合精度 (AMP) 训练
+fraction: 1.0 # (float) 用于训练的数据集比例（默认值为 1.0，即使用所有图像）
+profile: False # (bool) 在训练期间为 ONNX 和 TensorRT 记录速度
+freeze: None # (int | list, optional) 冻结前 n 层，或冻结指定层的索引列表
+multi_scale: False # (bool) 是否在训练期间使用多尺度
+
+# Segmentation
+overlap_mask: True # (bool) 在训练过程中将对象掩码合并为单个图像掩码（仅适用于分割训练）
+mask_ratio: 4 # (int) 掩码下采样比例（仅适用于分割训练）
+# Classification
+dropout: 0.0 # (float) 使用 Dropout 正则化（仅适用于分类训练）
+
+# Val/Test settings ----------------------------------------------------------------------------------------------------
+val: True # (bool) 是否在训练过程中进行验证/测试
+split: val # (str) 用于验证的数据集划分，例如 'val', 'test' 或 'train'
+save_json: False # (bool) 是否将验证/测试结果保存为 JSON 文件
+conf: 0.8 # (float, optional) 检测的置信度阈值（默认值：预测为 0.25，验证为 0.001）
+iou: 0.8 # (float) 非极大值抑制 (NMS) 的交并比 (IoU) 阈值
+max_det: 300 # (int) 每张图像的最大检测数量
+half: False # (bool) 是否使用半精度 (FP16)
+dnn: False # (bool) 是否使用 OpenCV DNN 进行 ONNX 推理
+plots: True # (bool) 是否在训练/验证过程中保存图表和图像
+
+# Predict settings -----------------------------------------------------------------------------------------------------
+source: # (str, optional) source directory for images or videos
+vid_stride: 1 # (int) 视频帧率步幅
+stream_buffer: False # (bool) 是否缓冲所有流媒体帧 (True) 或仅返回最近的帧 (False)
+visualize: False # (bool) 是否可视化模型特征
+augment: False # (bool) 是否对预测源应用图像增强
+agnostic_nms: False # (bool) 是否使用类别无关的非极大值抑制 (NMS)
+classes: # (int | list[int], optional) 按类别过滤结果，例如 classes=0 或 classes=[0,2,3]
+retina_masks: False # (bool) 是否使用高分辨率分割掩码
+embed: # (list[int], optional) 返回指定层的特征向量/嵌入
+
+# Visualize settings ---------------------------------------------------------------------------------------------------
+show: False # (bool) 是否在环境允许的情况下显示预测的图像和视频
+save_frames: False # (bool) 是否保存预测的单个视频帧
+save_txt: False # (bool) 是否将结果保存为 .txt 文件
+save_conf: False # (bool) 是否将置信度分数与结果一起保存
+save_crop: False # (bool) 是否保存裁剪后的检测结果图像
+show_labels: True # (bool) 是否显示预测标签，例如 'person'
+show_conf: True # (bool) 是否显示预测置信度，例如 '0.99'
+show_boxes: True # (bool) 是否显示预测边界框
+line_width: None  # (int, optional) 边界框的线宽。如果为 None，则根据图像大小进行缩放
+
+# Export settings ------------------------------------------------------------------------------------------------------
+format: torchscript # (str) 导出模型的格式，可选值请参考 https://docs.ultralytics.com/modes/export/#export-formats
+keras: False # (bool) 是否导出为 Keras 格式
+optimize: False # (bool) 是否优化 TorchScript 模型以适配移动设备
+int8: False # (bool) 是否启用 CoreML/TF 的 INT8 量化
+dynamic: False # (bool) 是否启用 ONNX/TF/TensorRT 的动态轴
+simplify: True # (bool) 是否使用 `onnxslim` 简化 ONNX 模型
+opset: # (int, optional) ONNX 的 opset 版本
+workspace: None # (float, optional) TensorRT 的工作空间大小（以 GiB 为单位），如果为 None，TensorRT 将自动分配内存
+nms: False # (bool) 是否在 CoreML 模型中添加非极大值抑制（NMS）
+
+# Hyperparameters ------------------------------------------------------------------------------------------------------
+lr0: 0.01 # (float) 初始学习率，例如 SGD=1E-2, Adam=1E-3，默认值为 0.01
+lrf: 0.01 # (float) 最终学习率（lr0 * lrf），表示初始学习率的一个比例，默认值为 0.01
+momentum: 0.937 # (float) SGD 动量/Adam 的 beta1 参数
+weight_decay: 0.0005 # (float) 优化器的权重衰减（L2 正则化），默认值为 5e-4
+warmup_epochs: 3.0 # (float) 热身阶段的轮数（可以是小数）
+warmup_momentum: 0.8 # (float) 热身阶段的初始动量
+warmup_bias_lr: 0.1 # (float) 热身阶段的初始偏置学习率
+box: 7.5 # (float) 边界框损失的权重
+cls: 0.5 # (float) 分类损失的权重（与像素数量成比例）
+dfl: 1.5 # (float) 分布式焦点损失（DFL）的权重
+pose: 12.0 # (float) 姿态损失的权重
+kobj: 1.0 # (float) 关键点目标损失的权重
+nbs: 64 # (int) 标准批量大小
+hsv_h: 0.015 # (float) 图像 HSV 色调增强的幅度（比例）
+hsv_s: 0.7 # (float) 图像 HSV 饱和度增强的幅度（比例）
+hsv_v: 0.4 # (float) 图像 HSV 亮度增强的幅度（比例）
+degrees: 0.0 # (float) 图像旋转角度范围（正负角度）
+translate: 0.1 # (float) 图像平移范围（比例）
+scale: 0.5 # (float) 图像缩放范围（增益）
+shear: 0.0 # (float) 图像剪切范围（正负角度）
+perspective: 0.0 # (float) 图像透视变换范围（比例），范围 0-0.001
+flipud: 0.0 # (float) 图像上下翻转的概率
+fliplr: 0.5 # (float) 图像左右翻转的概率
+bgr: 0.0 # (float) 图像通道 BGR 的概率
+mosaic: 1.0 # (float) 图像 Mosaic 数据增强的概率
+mixup: 0.0 # (float) 图像 MixUp 数据增强的概率
+copy_paste: 0.0 # (float) 分割任务中的复制粘贴增强的概率
+copy_paste_mode: "flip" # (str) 复制粘贴增强的方法（可选值：flip, mixup）
+auto_augment: randaugment # (str) 分类任务的自动增强策略（可选值：randaugment, autoaugment, augmix）
+erasing: 0.4 # (float) 分类训练中随机擦除的概率（0-0.9），0 表示不擦除，必须小于 1.0
+crop_fraction: 1.0 # (float) 分类任务的图像裁剪比例（0.1-1），1.0 表示不裁剪，必须大于 0
+
+# Custom config.yaml ---------------------------------------------------------------------------------------------------
+cfg: # (str, optional) for overriding defaults.yaml
+
+# Tracker settings ------------------------------------------------------------------------------------------------------
+tracker: botsort.yaml # (str) tracker type, choices=[botsort.yaml, bytetrack.yaml]
